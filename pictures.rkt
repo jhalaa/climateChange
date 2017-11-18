@@ -8,7 +8,10 @@
 (provide SCENE3
          TREE
          CLOUD
-         SUN)
+         SUN
+         WATER-BLUE
+         WATER-CFBLUE
+         WATER-PURPLE)
 
 
 ;;; MOUNTAINS
@@ -126,5 +129,5 @@
 
 ;;; FACTORY
 (overlay/offset (rectangle 120 50 'solid 'DimGray)
-                100 30
+                100 10
                 (rectangle 20 40 'solid 'black))
