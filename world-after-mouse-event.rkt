@@ -26,6 +26,11 @@
 (define BUTTON3X 500)
 (define BUTTON3Y 100)
 
+(define CAR-INIT-X 30)
+(define CAR-INIT-VX 5)
+
+(define FACT-INIT-X 25)
+
 (define MOUSE-UP "button-up")
 (define MOUSE-DOWN "button-down")
 
@@ -58,7 +63,7 @@
 ;; DESIGN STRATEGY: Use Constructor template on World
 
 (define (world-after-b1-press w)
-  (make-world (cars-after-tick (world-cars w))
+  (make-world (add-car (world-cars w))
               (world-trees w)
               (world-factories w)
               (world-state w)))
@@ -70,7 +75,7 @@
 
 (define (world-after-b2-press w)
   (make-world (world-cars w)
-              (trees-after-tick (world-trees w))
+              (remove-tree (world-trees w))
               (world-factories w)
               (world-state w)))
 
@@ -82,5 +87,46 @@
 (define (world-after-b3-press w)
   (make-world (world-cars w)
               (world-trees w)
-              (factories-after-tick (world-factories w))
+              (add-factory (world-factories w))
               (world-state w)))
+
+;; add-car: CarList -> CarList
+;; GIVEN: A list of cars
+;; RETURNS: A similar list of cars, but with one more car
+;; DESIGN STRATEGY: Use simpler function
+
+(define (add-car cl)
+  (append cl (list (make-car (random 50 450) CAR-INIT-VX))))
+
+;; remove-tree: TreeList -> TreeList
+;; GIVEN: A list of trees
+;; RETURNS: A similar list of trees but with one tree removed
+;; DESIGN STRATEGY: Divide into cases
+
+(define (remove-tree tl)
+  (cond
+    [(or (empty? tl) (empty? (rest tl))) empty]
+    [else (cons (first tl) (remove-tree (rest tl)))]))
+
+;; add-factory: FactoryList -> FactoryList
+;; GIVEN: A list of factories
+;; RETURNS: A similar list of factories but with a new one added
+;; DESIGN STRATEGY: Use simpler functions
+
+(define (add-factory fl)
+  (append fl (list (make-factory (random 50 450)))))
+
+
+#|
+
+buttons
+sun
+land
+water
+clouds - ***
+mountains
+trees - ***
+cars - ***
+factories - ***
+
+|#
