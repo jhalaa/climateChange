@@ -12,7 +12,8 @@
          WATER-BLUE
          WATER-CFBLUE
          WATER-PURPLE
-         new-car)
+         new-car
+         CAR)
 
 
 ;;; MOUNTAINS
