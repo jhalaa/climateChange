@@ -5,7 +5,6 @@
 (require "extras.rkt")
 (require 2htdp/image)
 (require 2htdp/universe)
-(require "climateChange.rkt")
 
 (provide
  world-after-mouse-event)
