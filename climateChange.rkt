@@ -3,6 +3,10 @@
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname climateChange) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require rackunit)
 (require "extras.rkt")
+(require "pictures.rkt")
+(require 2htdp/universe)
+(require "MouseEvents.rkt")
+
 
 (define BOUNDRY-CAR-LEFT 15)
 (define BOUNDRY-CAR-RIGHT 35)
@@ -22,9 +26,22 @@
 (define TREE-Y 310)
 
 
-(define INITIAL-CLOUDS ())
-(define INITIAL-TREES)
-(define INITIAL-WATER)
+(define INITIAL-CLOUDS (list (make-cloud 5 5) (make-cloud 20 -5)))
+(define INITIAL-TREES (list (make-tree 30) (make-tree 40)))
+(define INITIAL-WATER (make-water 7))
+
+;; World is represented as Struct
+;; (world Cars Clouds Factories Trees Water)
+
+;; INTERPRETATION:
+;; cars      : CarList is cars in the world
+;; clouds    : CloudList is clouds in the world
+;; factories : FactoryList is factories in the world
+;; trees     : TreeList is trees in the world
+;; water     : Water is a water in the world
+
+;; CONSTRUCTOR TEMPLATE:
+(define-struct world (crs clds fctrs trs wtr))
 
 
 ;; Car is represented as a struct
@@ -202,7 +219,7 @@
 ;; x : Integer is the x-coordinate of WATER_IMAGE
 
 ;; CONSTRUCTOR TEMPLATE:
-(make-struct water (x))
+(define-struct water (x))
 
 ;; water-on-tick : Water -> Water
 
@@ -211,19 +228,6 @@
       (make-water BOUNDRY-WATER-RIGHT)
       (make-water BOUNDRY-WATER-LEFT)))
 
-
-;; World is represented as Struct
-;; (world Cars Clouds Factories Trees Water)
-
-;; INTERPRETATION:
-;; cars      : CarList is cars in the world
-;; clouds    : CloudList is clouds in the world
-;; factories : FactoryList is factories in the world
-;; trees     : TreeList is trees in the world
-;; water     : Water is a water in the world
-
-;; CONSTRUCTOR TEMPLATE:
-(define-struct world (crs clds fctrs trs wtr))
 
 
 ;; simulation : PosReal -> World
@@ -293,7 +297,7 @@
   (foldl (lambda (cr curr_scn)
            (place-image CAR (car-x cr) CAR-Y curr_scn))
          scene
-         cars-lst)
+         cars-lst))
 
 ;; draws clouds
   
@@ -301,7 +305,7 @@
   (foldl (lambda (cld curr_scn)
            (place-image CLOUD (cloud-x cld) CLOUD-Y curr_scn))
          scene
-         clouds-lst)
+         clouds-lst))
 
 ;; draws trees
   
@@ -309,5 +313,15 @@
   (foldl (lambda (tr curr_scn)
            (place-image TREE (tree-x tr) TREE-Y curr_scn))
          scene
-         trees-lst)
+         trees-lst))
+
+
+;; Tree is represented as Struct
+;; (Tree x)
+
+;; INTERPRETATION:
+;; x : Integer is the x-coordinate of TREE_IMAGE
+
+;; CONSTRUCTOR TEMPLATE:
+(define-struct tree (x))
 
