@@ -11,7 +11,8 @@
          SUN
          WATER-BLUE
          WATER-CFBLUE
-         WATER-PURPLE)
+         WATER-PURPLE
+         new-car)
 
 
 ;;; MOUNTAINS
@@ -108,7 +109,7 @@
                              (circle 8 "solid" 'DimGray))
             0 -5
             (rectangle 60 15 'solid main-color)))))
-
+(define CAR (new-car 0))
 
 ;;; WATER
 (define (water color)
