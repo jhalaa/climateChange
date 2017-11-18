@@ -16,6 +16,17 @@
 (define POSITIVE-VELOCITY 5)
 (define NEGATIVE-VELOCITY -5)
 
+(define CAR-Y 300)
+(define WATER-Y 330)
+(define CLOUD-Y 70)
+(define TREE-Y 310)
+
+
+(define INITIAL-CLOUDS ())
+(define INITIAL-TREES)
+(define INITIAL-WATER)
+
+
 ;; Car is represented as a struct
 ;; (car Integer Integer)
 
@@ -201,8 +212,102 @@
       (make-water BOUNDRY-WATER-LEFT)))
 
 
+;; World is represented as Struct
+;; (world Cars Clouds Factories Trees Water)
+
+;; INTERPRETATION:
+;; cars      : CarList is cars in the world
+;; clouds    : CloudList is clouds in the world
+;; factories : FactoryList is factories in the world
+;; trees     : TreeList is trees in the world
+;; water     : Water is a water in the world
+
+;; CONSTRUCTOR TEMPLATE:
+(define-struct world (crs clds fctrs trs wtr))
 
 
+;; simulation : PosReal -> World
+;; GIVEN: the speed of the simulation, in seconds per tick (so larger numbers run slower)
+;; EFFECT: runs the simulation, starting with the initial world
+;; RETURNS: the final state of the world
+
+;; EXAMPLES:
+;; (simulation 1) runs in super slow motion
+;; (simulation 1/24) runs at a more realistic speed
+          
+(define (simulation speed-of-simulation)
+  (big-bang (initial-world speed-of-simulation)
+            (on-tick world-after-tick)
+            (on-mouse world-after-mouse-event)
+            (on-draw world-to-scene)))
 
 
+;; initial-world : PosReal -> World
+;; GIVEN : the speed of ssimulation in seconds
+;; RETURNS : the initial world
+
+(define (initial-world speed)
+  (make-world empty
+              INITIAL-CLOUDS
+              empty
+              INITIAL-TREES
+              INITIAL-WATER))
+
+
+;; world-after-tick : World -> World
+;; GIVEN : the World
+;; RETURNS : the world after a tick
+;; DESIGN STRATEGY : Use constructor template of world
+
+(define (world-after-tick world)
+  (make-world (cars-on-tick (world-crs world))
+              (clouds-on-tick (world-clds world))
+              (world-fctrs world)
+              (world-trs world)
+              (water-on-tick (world-wtr world))))
+
+
+;; CONTRACT AND PURPOSE STATEMENT
+;; world-to-scene : World -> Scene
+;; GIVEN: a World
+;; RETURNS: a Scene that portrays the given world.
+
+;; DESIGN STRATEGY
+;; Place objects of world in position
+
+;; FUNCTION DEFINITION
+(define (world-to-scene world)
+  (scene-water INITIAL-WATER
+               (scene-clouds INITIAL-CLOUDS
+                             (scene-trees INITIAL-TREES
+                                          (scene-cars INITIAL-CARS
+                                                      SCENE3)))))
+;; draws water
+
+(define (scene-water water scene)
+  (place-image WATER (water-x water) WATER-Y scene))
+
+;; draws cars
+
+(define (scene-cars cars-lst scene)
+  (foldl (lambda (cr curr_scn)
+           (place-image CAR (car-x cr) CAR-Y curr_scn))
+         scene
+         cars-lst)
+
+;; draws clouds
+  
+(define (scene-clouds clouds-lst scene)
+  (foldl (lambda (cld curr_scn)
+           (place-image CLOUD (cloud-x cld) CLOUD-Y curr_scn))
+         scene
+         clouds-lst)
+
+;; draws trees
+  
+(define (scene-trees trees-lst scene)
+  (foldl (lambda (tr curr_scn)
+           (place-image TREE (tree-x tr) TREE-Y curr_scn))
+         scene
+         trees-lst)
 
