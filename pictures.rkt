@@ -10,12 +10,36 @@
          CLOUD
          SUN)
 
+
+;;; MOUNTAINS
+(define MOUNTAIN1 (overlay/align
+ "middle" "top"
+ (isosceles-triangle 120 110 "solid" 'white)
+ (isosceles-triangle 600 110 "solid" 'LimeGreen)))
+
+(define MOUNTAIN2 (overlay/align
+ "middle" "top"
+ (isosceles-triangle 80 80 "solid" 'white)
+ (isosceles-triangle 600 80 "solid" 'ForestGreen)))
+
+(define MOUNTAIN3
+ (isosceles-triangle 600 120 "solid" 'DarkOliveGreen))
+
 ;;; SCENE is a skyblue bacjground with grey frame
 ;;; size : 640 * 360
 ;;; Useful size: 620 * 290
 ;;; Button dashboard size: 620 * 50
 (define SCENE (overlay (above (rectangle 620 50 'solid 'Silver)
-                (rectangle 620 290 'solid 'DeepSkyBlue))
+                (place-image
+                 MOUNTAIN1
+                 300 230
+                 (place-image
+                  MOUNTAIN2
+                  500 250
+                  (place-image
+                   MOUNTAIN3
+                   120 250
+                   (rectangle 620 290 'solid 'DeepSkyBlue)))))
          (rectangle 640 360 'solid 'Silver)))
 ;;; BUTTON is just a black square outline
 ;;; BUTTON is 40 * 40
@@ -36,10 +60,15 @@
 (define LEAVES (circle 30 'solid 'green))
 (define TREE (overlay/offset BRANCH 0 -25 LEAVES))
 
-(define cld (circle 20 'solid 'white))
-(define clds (beside cld cld))
 
+;;; CLOUD
+(define cld (circle 20 'solid 'WhiteSmoke))
+(define clds (beside cld cld))
 (define CLOUD (overlay/offset (overlay/offset cld 0 20 cld) 0 0 clds))
+
+(define cld-g (circle 20 'solid 'DarkGray))
+(define cldgs (beside cld-g cld-g))
+(define CLOUD-G (overlay/offset (overlay/offset cld-g 0 20 cld-g) 0 0 cldgs))
 
 ;;; SUN size : 87 * 100
 (define SUN (let ([petal (put-pinhole
@@ -54,3 +83,48 @@
       (rotate (* 60 3) petal)
       (rotate (* 60 4) petal)
       (rotate (* 60 5) petal)))))
+
+;;; CAR :size : 60 * 40
+;;; as (new-car 0)
+
+;;; random-color : int -> Radndom Color
+(define (random-color _)
+  (make-color (random 255) (random 255) (random 255)))
+
+(define (new-car _)
+  (let ([main-color (random-color 0)])
+    (above (overlay/align
+            "center" "center"
+            (underlay/offset (rectangle 15 10 "solid" 'LightCyan)
+                             -20 0
+                             (rectangle 15 10 "solid" 'LightCyan))
+            (rectangle 40 20 'solid main-color))
+           (overlay/offset
+            (underlay/offset (circle 8 "solid" 'DimGray)
+                             -30 0
+                             (circle 8 "solid" 'DimGray))
+            0 -5
+            (rectangle 60 15 'solid main-color)))))
+
+
+;;; WATER
+(define (water color)
+  (let ([wave (triangle 100 "solid" color)])
+    (local ((define (draw/a water/a t)
+            (if (= t 0)
+                water/a
+                (draw/a (overlay/align/offset
+                         "right" "bottom"
+                         water/a
+                         40 0
+                         wave)
+                        (sub1 t)))))
+      (draw/a wave 10))))
+(define WATER-BLUE (water "blue"))
+(define WATER-CFBLUE (water "CornflowerBlue"))
+(define WATER-PURPLE (water "Indigo"))
+
+;;; FACTORY
+(overlay/offset (rectangle 120 50 'solid 'DimGray)
+                100 30
+                (rectangle 20 40 'solid 'black))
