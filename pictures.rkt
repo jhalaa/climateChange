@@ -7,7 +7,8 @@
 (require 2htdp/image) ; draw a picture
 (provide SCENE3
          TREE
-         CLOUD)
+         CLOUD
+         SUN)
 
 ;;; SCENE is a skyblue bacjground with grey frame
 ;;; size : 640 * 360
@@ -40,4 +41,16 @@
 
 (define CLOUD (overlay/offset (overlay/offset cld 0 20 cld) 0 0 clds))
 
-
+;;; SUN size : 87 * 100
+(define SUN (let ([petal (put-pinhole
+                5 50
+                (isosceles-triangle 20 30 "solid" 'yellow))])
+    (clear-pinhole
+     (overlay/pinhole
+      (circle 20 "solid" "yellow")
+      (rotate (* 60 0) petal)
+      (rotate (* 60 1) petal)
+      (rotate (* 60 2) petal)
+      (rotate (* 60 3) petal)
+      (rotate (* 60 4) petal)
+      (rotate (* 60 5) petal)))))
