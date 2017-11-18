@@ -5,7 +5,9 @@
 (require rackunit)
 (require "extras.rkt")
 (require 2htdp/image) ; draw a picture
-(provide SCENE3)
+(provide SCENE3
+         TREE
+         CLOUD)
 
 ;;; SCENE is a skyblue bacjground with grey frame
 ;;; size : 640 * 360
@@ -15,6 +17,7 @@
                 (rectangle 620 290 'solid 'DeepSkyBlue))
          (rectangle 640 360 'solid 'Silver)))
 ;;; BUTTON is just a black square outline
+;;; BUTTON is 40 * 40
 (define BUTTON (rectangle 40 40 'outline 'black))
 
 ;;; store positions of buttons
@@ -27,4 +30,14 @@
               (list BUTTON1-POS BUTTON2-POS BUTTON3-POS)
               SCENE))
 
-SCENE3
+;;; TREE size : 60 * 80
+(define BRANCH (rectangle 15 50 'solid 'brown))
+(define LEAVES (circle 30 'solid 'green))
+(define TREE (overlay/offset BRANCH 0 -25 LEAVES))
+
+(define cld (circle 20 'solid 'white))
+(define clds (beside cld cld))
+
+(define CLOUD (overlay/offset (overlay/offset cld 0 20 cld) 0 0 clds))
+
+
