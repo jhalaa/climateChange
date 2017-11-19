@@ -42,10 +42,11 @@
 (define POSITIVE-VELOCITY 5)
 (define NEGATIVE-VELOCITY -5)
 
-(define CAR-Y 300)
+(define CAR-Y 330)
 (define WATER-Y 350)
 (define CLOUD-Y 100)
-(define TREE-Y 300)
+(define TREE-Y 310)
+(define FACTORY-Y 290)
 
 ;; CONSTRUCTOR TEMPLATE:
 (define-struct water (x vx))
@@ -115,7 +116,7 @@
 ;; vx : Velocity in the x direction
 
 ;; CONSTRUCTOR:
-(define-struct car-struct (x vx))
+(define-struct car-struct (x vx img))
 
 ;; OBSERVER TEMPLATE:
 (define (car-fn car)
@@ -153,7 +154,7 @@
 
 (define (car-after-tick car)
   (if(car-test-boundry car)
-     (make-car-struct (+ (car-struct-x car) (car-struct-vx car)) (car-struct-vx car))
+     (make-car-struct (+ (car-struct-x car) (car-struct-vx car)) (car-struct-vx car) (car-struct-img car))
      (car-negate-velocity car)))
 
 
@@ -172,23 +173,23 @@
 
 ;; DESIGN STRATEGY:negte and send
 (define (car-negate-velocity car)
-  (make-car-struct (car-struct-x car) (* -1 (car-struct-vx car))))
+  (make-car-struct (car-struct-x car) (* -1 (car-struct-vx car)) (car-struct-img car)))
 
 ;; TESTS for Cars
 
-(define TEST-CAR-LEFT-BOUND  (make-car-struct 17 NEGATIVE-VELOCITY))
-(define TEST-CAR-RIGHT-BOUND (make-car-struct 33 POSITIVE-VELOCITY))
-(define TEST-CAR-IN-BOUND    (make-car-struct 20 POSITIVE-VELOCITY))
+#;(define TEST-CAR-LEFT-BOUND  (make-car-struct 17 NEGATIVE-VELOCITY))
+#;(define TEST-CAR-RIGHT-BOUND (make-car-struct 33 POSITIVE-VELOCITY))
+#;(define TEST-CAR-IN-BOUND    (make-car-struct 20 POSITIVE-VELOCITY))
 
-(define TEST-CAR-LIST (list TEST-CAR-LEFT-BOUND
+#;(define TEST-CAR-LIST (list TEST-CAR-LEFT-BOUND
                      TEST-CAR-RIGHT-BOUND
                      TEST-CAR-IN-BOUND))
 
-(define TEST-CAR-LEFT-BOUND-AFTER-TICK  (make-car-struct 17 POSITIVE-VELOCITY))
-(define TEST-CAR-RIGHT-BOUND-AFTER-TICK (make-car-struct 33 NEGATIVE-VELOCITY))
-(define TEST-CAR-IN-BOUND-AFTER-TICK    (make-car-struct 25 POSITIVE-VELOCITY))
+#;(define TEST-CAR-LEFT-BOUND-AFTER-TICK  (make-car-struct 17 POSITIVE-VELOCITY))
+#;(define TEST-CAR-RIGHT-BOUND-AFTER-TICK (make-car-struct 33 NEGATIVE-VELOCITY))
+#;(define TEST-CAR-IN-BOUND-AFTER-TICK    (make-car-struct 25 POSITIVE-VELOCITY))
 
-(define TEST-CAR-LIST-AFTER-TICK (list TEST-CAR-LEFT-BOUND-AFTER-TICK
+#;(define TEST-CAR-LIST-AFTER-TICK (list TEST-CAR-LEFT-BOUND-AFTER-TICK
                                        TEST-CAR-RIGHT-BOUND-AFTER-TICK
                                        TEST-CAR-IN-BOUND-AFTER-TICK))
 
@@ -384,7 +385,7 @@
 
 (define (scene-cars cars-lst scene)
   (foldl (lambda (cr curr_scn)
-           (place-image (new-car 0) (car-struct-x cr) CAR-Y curr_scn))
+           (place-image (car-struct-img cr) (car-struct-x cr) CAR-Y curr_scn))
          scene
          cars-lst))
 
@@ -408,7 +409,7 @@
 
 (define (scene-factories fact-lst scene)
   (foldl (lambda (fct curr_scn)
-           (place-image FACTORY (factory-x fct) TREE-Y curr_scn))
+           (place-image FACTORY (factory-x fct) FACTORY-Y curr_scn))
          scene
          fact-lst))
 
@@ -470,7 +471,7 @@
 ;; DESIGN STRATEGY: Use simpler function
 
 (define (add-car cl)
-  (append cl (list (make-car-struct 50 CAR-INIT-VX))))
+  (append cl (list (make-car-struct 50 CAR-INIT-VX (new-car 0)))))
 
 ;; remove-tree: TreeList -> TreeList
 ;; GIVEN: A list of trees
