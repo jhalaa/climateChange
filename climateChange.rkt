@@ -5,21 +5,22 @@
 (require "extras.rkt")
 (require "pictures.rkt")
 (require 2htdp/universe)
+(require 2htdp/image)
 
-(define BUTTON1H 50)
-(define BUTTON1W 50)
-(define BUTTON1X 100)
-(define BUTTON1Y 100)
+(define BUTTON1H 40)
+(define BUTTON1W 40)
+(define BUTTON1X 40)
+(define BUTTON1Y 30)
 
-(define BUTTON2H 50)
-(define BUTTON2W 50)
-(define BUTTON2X 300)
-(define BUTTON2Y 100)
+(define BUTTON2H 40)
+(define BUTTON2W 40)
+(define BUTTON2X 90)
+(define BUTTON2Y 30)
 
-(define BUTTON3H 50)
-(define BUTTON3W 50)
-(define BUTTON3X 500)
-(define BUTTON3Y 100)
+(define BUTTON3H 40)
+(define BUTTON3W 40)
+(define BUTTON3X 140)
+(define BUTTON3Y 30)
 
 (define CAR-INIT-X 30)
 (define CAR-INIT-VX 5)
@@ -29,27 +30,49 @@
 (define MOUSE-UP "button-up")
 (define MOUSE-DOWN "button-down")
 
-(define BOUNDRY-CAR-LEFT 15)
-(define BOUNDRY-CAR-RIGHT 35)
+(define BOUNDRY-CAR-LEFT 0)
+(define BOUNDRY-CAR-RIGHT 300)
 
-(define BOUNDRY-CLOUD-LEFT 15)
-(define BOUNDRY-CLOUD-RIGHT 35)
+(define BOUNDRY-CLOUD-LEFT 0)
+(define BOUNDRY-CLOUD-RIGHT 640)
 
-(define BOUNDRY-WATER-LEFT 580)
-(define BOUNDRY-WATER-RIGHT 620)
+(define BOUNDRY-WATER-LEFT 600)
+(define BOUNDRY-WATER-RIGHT 640)
 
 (define POSITIVE-VELOCITY 5)
 (define NEGATIVE-VELOCITY -5)
 
 (define CAR-Y 300)
 (define WATER-Y 330)
-(define CLOUD-Y 70)
-(define TREE-Y 310)
+(define CLOUD-Y 100)
+(define TREE-Y 300)
 
+;; CONSTRUCTOR TEMPLATE:
+(define-struct water (x vx))
 
-(define INITIAL-CLOUDS (list (make-cloud 5 5) (make-cloud 20 -5)))
-(define INITIAL-TREES (list (make-tree 30) (make-tree 40)))
-(define INITIAL-WATER (make-water 7))
+;; Factory is represented as Struct
+;; (Factory x)
+
+;; INTERPRETATION:
+;; x : Integer is the x-coordinate of FACTORY_IMAGE
+
+;; CONSTRUCTOR TEMPLATE:
+(define-struct factory (x))
+
+;; Tree is represented as Struct
+;; (Tree x)
+
+;; INTERPRETATION:
+;; x : Integer is the x-coordinate of TREE_IMAGE
+
+;; CONSTRUCTOR TEMPLATE:
+(define-struct tree (x))
+
+;; world-after-mouse-event: World MouseEvent Int Int -> World
+;; GIVEN: A world, a mouse event and its coordinates
+;; RETURNS: A world after the given mouse event
+;; DESIGN STRATEGY: Divide into cases
+
 
 ;; World is represented as Struct
 ;; (world Cars Clouds Factories Trees Water)
@@ -63,6 +86,25 @@
 
 ;; CONSTRUCTOR TEMPLATE:
 (define-struct world (crs clds fctrs trs wtr))
+
+;; Cloud is represented as a struct
+;; (cloud Integer Integer)
+
+;; INTERPRETATION:
+;; x : Integer is the x-coordinate of the cloud
+;; vx : Velocity in the x direction
+
+;; CONSTRUCTOR:
+(define-struct cloud (x vx))
+
+;; OBSERVER TEMPLATE:
+(define (cloud-fn cld)
+  (cond [(cloud-x cld) ...]
+        [(cloud-vx cld) ...]))
+
+;; Clouds is a list of cloud structs which each have;
+;; x position -> Int
+;; y position -> Int
 
 
 ;; Car is represented as a struct
@@ -83,6 +125,12 @@
 ;;cars is a list of car structs which each have;
 ;; x position -> Int
 ;; y position -> Int
+
+
+
+(define INITIAL-CLOUDS (list (make-cloud 100 5) (make-cloud 450 -5)))
+(define INITIAL-TREES (list (make-tree 30) (make-tree 40)))
+(define INITIAL-WATER (list (make-water 590 2) (make-water 620 -3)))
 
 
 ;; Functions ;;
@@ -143,30 +191,11 @@
                                        TEST-CAR-RIGHT-BOUND-AFTER-TICK
                                        TEST-CAR-IN-BOUND-AFTER-TICK))
 
-(begin-for-test
+#;(begin-for-test
   (check-equal? (cars-on-tick TEST-CAR-LIST)
                 TEST-CAR-LIST-AFTER-TICK
                 "the list of cars is updated incorrectly"))
 
-
-;; Cloud is represented as a struct
-;; (cloud Integer Integer)
-
-;; INTERPRETATION:
-;; x : Integer is the x-coordinate of the cloud
-;; vx : Velocity in the x direction
-
-;; CONSTRUCTOR:
-(define-struct cloud (x vx))
-
-;; OBSERVER TEMPLATE:
-(define (cloud-fn cld)
-  (cond [(cloud-x cld) ...]
-        [(cloud-vx cld) ...]))
-
-;; Clouds is a list of cloud structs which each have;
-;; x position -> Int
-;; y position -> Int
 
 
 ;; Functions ;;
@@ -227,7 +256,7 @@
                                          TEST-CLOUD-RIGHT-BOUND-AFTER-TICK
                                          TEST-CLOUD-IN-BOUND-AFTER-TICK))
 
-(begin-for-test
+#;(begin-for-test
   (check-equal? (clouds-on-tick TEST-CLOUD-LIST)
                 TEST-CLOUDS-LIST-AFTER-TICK
                 "the list of clouds is updated incorrectly"))
@@ -239,16 +268,46 @@
 ;; INTERPRETATION:
 ;; x : Integer is the x-coordinate of WATER_IMAGE
 
-;; CONSTRUCTOR TEMPLATE:
-(define-struct water (x))
+;; waters-on-tick : WaterList -> WaterList
+;; GIVEN   : a list of water
+;; RETURNS : a list of water after-tick
+;; DESIGN STRATEGY : use HOF map and lambda
 
-;; water-on-tick : Water -> Water
+(define (waters-on-tick wtr-lst)
+  (map (lambda (wtr)
+         (water-after-tick wtr))
+       wtr-lst))
 
-(define (water-on-tick wtr)
-  (if (= (water-x wtr) BOUNDRY-WATER-LEFT)
-      (make-water BOUNDRY-WATER-RIGHT)
-      (make-water BOUNDRY-WATER-LEFT)))
+;; water-after-tick : Water -> Water
+;; GIVEN   : a water
+;; RETURNS : a water after-tick
+;; DESIGN STRATEGY : call other function
 
+(define (water-after-tick wtr)
+  (if(water-test-boundry wtr)
+     (make-water (+ (water-x wtr) (water-vx wtr)) (water-vx wtr))
+     (water-negate-velocity wtr)))
+
+
+;; test_boundry : Water -> Boolean
+;; GIVEN : a water
+;; RETURNS : if the water is in the boundry condition
+
+;; DESIGN STRATEGY: check for conditions
+(define (water-test-boundry wtr)
+  (and (> (+ (water-x wtr) (water-vx wtr)) BOUNDRY-WATER-LEFT)
+       (< (+ (water-x wtr) (water-vx wtr)) BOUNDRY-WATER-RIGHT)))
+
+
+;; water-negate-velocity : Water -> Water
+;; GIVEN : a water
+;; RETURNS : it returns water with the x velocity negated
+;; DESIGN STRATEGY:negte and send
+
+(define (water-negate-velocity wtr)
+  (make-water (water-x wtr) (* -1 (water-vx wtr))))
+
+;; WaterList is a list of Water
 
 
 ;; simulation : PosReal -> World
@@ -289,7 +348,7 @@
               (clouds-on-tick (world-clds world))
               (world-fctrs world)
               (world-trs world)
-              (water-on-tick (world-wtr world))))
+              (waters-on-tick (world-wtr world))))
 
 
 ;; CONTRACT AND PURPOSE STATEMENT
@@ -301,22 +360,25 @@
 ;; Place objects of world in position
 
 ;; FUNCTION DEFINITION
-(define (world-to-scene world)
-  (scene-water INITIAL-WATER
-               (scene-clouds INITIAL-CLOUDS
-                             (scene-trees INITIAL-TREES
-                                          (scene-cars INITIAL-CARS
+(define (world-to-scene w)
+  (scene-water (world-wtr w)
+               (scene-clouds (world-clds w)
+                             (scene-trees (world-trs w)
+                                          (scene-cars (world-crs w)
                                                       SCENE3)))))
 ;; draws water
 
-(define (scene-water water scene)
-  (place-image WATER (water-x water) WATER-Y scene))
+(define (scene-water wtr-lst scene)
+  (foldl (lambda (wtr curr_scn)
+           (place-image WATER-BLUE (water-x wtr) WATER-Y curr_scn))
+         scene
+         wtr-lst))
 
 ;; draws cars
 
 (define (scene-cars cars-lst scene)
   (foldl (lambda (cr curr_scn)
-           (place-image CAR (car-x cr) CAR-Y curr_scn))
+           (place-image (new-car 0) (car-struct-x cr) CAR-Y curr_scn))
          scene
          cars-lst))
 
@@ -337,35 +399,21 @@
          trees-lst))
 
 
-;; Tree is represented as Struct
-;; (Tree x)
 
-;; INTERPRETATION:
-;; x : Integer is the x-coordinate of TREE_IMAGE
-
-;; CONSTRUCTOR TEMPLATE:
-(define-struct tree (x))
-
-;; world-after-mouse-event: World MouseEvent Int Int -> World
-;; GIVEN: A world, a mouse event and its coordinates
-;; RETURNS: A world after the given mouse event
-;; DESIGN STRATEGY: Divide into cases
-
-(define (world-after-mouse-event w mev x y)
-  (cond
+(define (world-after-mouse-event w x y mev)
+  (if (mouse=? mev MOUSE-DOWN)
+      (cond
     [(and (< (- BUTTON1X (/ BUTTON1W 2)) x (+ BUTTON1X (/ BUTTON1W 2)))
-          (< (- BUTTON1Y (/ BUTTON1H 2)) y (+ BUTTON1Y (/ BUTTON1H 2)))
-          (mouse=? mev MOUSE-UP))
+          (< (- BUTTON1Y (/ BUTTON1H 2)) y (+ BUTTON1Y (/ BUTTON1H 2))))
      (world-after-b1-press w)]
     [(and (< (- BUTTON2X (/ BUTTON2W 2)) x (+ BUTTON2X (/ BUTTON2W 2)))
-          (< (- BUTTON2Y (/ BUTTON2H 2)) y (+ BUTTON2Y (/ BUTTON2H 2)))
-          (mouse=? mev MOUSE-UP))
+          (< (- BUTTON2Y (/ BUTTON2H 2)) y (+ BUTTON2Y (/ BUTTON2H 2))))
      (world-after-b2-press w)]
     [(and (< (- BUTTON3X (/ BUTTON3W 2)) x (+ BUTTON3X (/ BUTTON3W 2)))
-          (< (- BUTTON3Y (/ BUTTON3H 2)) y (+ BUTTON3Y (/ BUTTON3H 2)))
-          (mouse=? mev MOUSE-UP))
+          (< (- BUTTON3Y (/ BUTTON3H 2)) y (+ BUTTON3Y (/ BUTTON3H 2))))
      (world-after-b3-press w)]
-    [else w]))
+    [else w])
+      w))
 
 ;; world-after-b1-press: World -> World
 ;; GIVEN: A world
@@ -373,10 +421,11 @@
 ;; DESIGN STRATEGY: Use Constructor template on World
 
 (define (world-after-b1-press w)
-  (make-world (add-car (world-cars w))
-              (world-trees w)
-              (world-factories w)
-              (world-state w)))
+  (make-world (add-car (world-crs w))
+              (world-clds w)
+              (world-fctrs w)
+              (world-trs w)
+              (world-wtr w)))
 
 ;; world-after-b2-press: World -> World
 ;; GIVEN: A world
@@ -384,10 +433,11 @@
 ;; DESIGN STRATEGY: Use Constructor template on World
 
 (define (world-after-b2-press w)
-  (make-world (world-cars w)
-              (remove-tree (world-trees w))
-              (world-factories w)
-              (world-state w)))
+  (make-world (world-crs w)
+              (world-clds w)
+              (world-fctrs w)
+              (remove-tree (world-trs w))
+              (world-wtr w)))
 
 ;; world-after-b3-press: World -> World
 ;; GIVEN: A world
@@ -395,10 +445,11 @@
 ;; DESIGN STRATEGY: Use Constructor template on World
 
 (define (world-after-b3-press w)
-  (make-world (world-cars w)
-              (world-trees w)
-              (add-factory (world-factories w))
-              (world-state w)))
+  (make-world (world-crs w)
+              (world-clds w)
+              (add-factory (world-fctrs w))
+              (world-trs w)
+              (world-wtr w)))
 
 ;; add-car: CarList -> CarList
 ;; GIVEN: A list of cars
@@ -406,7 +457,7 @@
 ;; DESIGN STRATEGY: Use simpler function
 
 (define (add-car cl)
-  (append cl (list (make-car (random 50 450) CAR-INIT-VX))))
+  (append cl (list (make-car-struct 50 CAR-INIT-VX))))
 
 ;; remove-tree: TreeList -> TreeList
 ;; GIVEN: A list of trees
@@ -424,4 +475,4 @@
 ;; DESIGN STRATEGY: Use simpler functions
 
 (define (add-factory fl)
-  (append fl (list (make-factory (random 50 450)))))
+  (append fl (list (make-factory 250))))
