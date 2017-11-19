@@ -17,6 +17,19 @@
          FACTORY
          FRAME)
 
+;;; SUN size : 87 * 100
+(define SUN (let ([petal (put-pinhole
+                5 50
+                (isosceles-triangle 20 30 "solid" 'yellow))])
+    (clear-pinhole
+     (overlay/pinhole
+      (circle 20 "solid" "yellow")
+      (rotate (* 60 0) petal)
+      (rotate (* 60 1) petal)
+      (rotate (* 60 2) petal)
+      (rotate (* 60 3) petal)
+      (rotate (* 60 4) petal)
+      (rotate (* 60 5) petal)))))
 
 ;;; MOUNTAINS
 (define MOUNTAIN1 (overlay/align
@@ -38,6 +51,9 @@
 ;;; Button dashboard size: 620 * 50
 (define SCENE (overlay (above (rectangle 620 50 'solid 'Silver)
                 (place-image
+                 (scale 0.8 SUN)
+                 400 50
+                 (place-image
                  MOUNTAIN1
                  300 230
                  (place-image
@@ -46,7 +62,7 @@
                   (place-image
                    MOUNTAIN3
                    120 250
-                   (rectangle 620 290 'solid 'DeepSkyBlue)))))
+                   (rectangle 620 290 'solid 'DeepSkyBlue))))))
          (rectangle 640 360 'solid 'Silver)))
 ;;; BUTTON is just a black square outline
 ;;; BUTTON is 40 * 40
@@ -86,19 +102,7 @@
 (define cldgs (beside cld-g cld-g))
 (define CLOUD-G (overlay/offset (overlay/offset cld-g 0 20 cld-g) 0 0 cldgs))
 
-;;; SUN size : 87 * 100
-(define SUN (let ([petal (put-pinhole
-                5 50
-                (isosceles-triangle 20 30 "solid" 'yellow))])
-    (clear-pinhole
-     (overlay/pinhole
-      (circle 20 "solid" "yellow")
-      (rotate (* 60 0) petal)
-      (rotate (* 60 1) petal)
-      (rotate (* 60 2) petal)
-      (rotate (* 60 3) petal)
-      (rotate (* 60 4) petal)
-      (rotate (* 60 5) petal)))))
+
 
 ;;; CAR :size : 60 * 40
 ;;; as (new-car 0)
@@ -183,8 +187,10 @@
 (define FRAME01 (place-images (list BUTTON1 BUTTON2 BUTTON3)
               (list BUTTON1-POS BUTTON2-POS BUTTON3-POS)
               FRAME0))
-(define FRAME FRAME01)
 
 
-#;(crop 200 0 200 60 (ellipse 400 140 "solid" 'DarkGoldenrod))
-#;(define FRAME (overlay/offset (circle 90 'solid 'DarkGoldenrod)))
+
+
+(define FRAME (underlay/align/offset "left" "bottom" (crop 360 0 360 80 (ellipse 720 160 "solid" 'DarkGoldenrod))
+                                     0 0
+                               FRAME01))
