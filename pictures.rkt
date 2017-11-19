@@ -50,7 +50,7 @@
 ;;; size : 640 * 360
 ;;; Useful size: 620 * 290
 ;;; Button dashboard size: 620 * 50
-(define SCENE (overlay (above (rectangle 620 50 'solid 'Silver)
+(define SCENE0 (overlay (above (rectangle 620 50 'solid 'Silver)
                 (place-image
                  (scale 0.8 SUN)
                  400 50
@@ -65,6 +65,11 @@
                    120 250
                    (rectangle 620 290 'solid 'DeepSkyBlue))))))
          (rectangle 640 360 'solid 'Silver)))
+
+(define SCENE (overlay/align/offset "left" "bottom" (crop 360 0 360 50 (ellipse 720 100 "solid" 'DarkGoldenrod))
+                                     -10 10
+                               SCENE0))
+
 ;;; BUTTON is just a black square outline
 ;;; BUTTON is 40 * 40
 (define BUTTON 
@@ -189,9 +194,4 @@
               (list BUTTON1-POS BUTTON2-POS BUTTON3-POS)
               FRAME0))
 
-
-
-
-(define FRAME (underlay/align/offset "left" "bottom" (crop 360 0 360 80 (ellipse 720 160 "solid" 'DarkGoldenrod))
-                                     0 0
-                               FRAME01))
+(define FRAME FRAME01)
