@@ -369,7 +369,7 @@
                              (scene-trees (world-trs w)
                                           (scene-cars (world-crs w)
                                                       (scene-factories (world-fctrs w)
-                                                      SCENE)))) w)))
+                                                      SCENE))) w) w)))
 ;; draws water
 
 (define (scene-water wtr-lst scene w)
@@ -390,9 +390,11 @@
 
 ;; draws clouds
   
-(define (scene-clouds clouds-lst scene)
+(define (scene-clouds clouds-lst scene w)
   (foldl (lambda (cld curr_scn)
-           (place-image CLOUD (cloud-x cld) CLOUD-Y curr_scn))
+           (place-image (if (checker w)
+                            CLOUD-G
+                            CLOUD) (cloud-x cld) CLOUD-Y curr_scn))
          scene
          clouds-lst))
 
