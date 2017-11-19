@@ -174,9 +174,9 @@
 (define FRAME0
   (above
  (rectangle 640 60 'solid "Silver")
- (overlay/offset (rectangle 10 360 'solid "Silver")
+ (overlay/offset (rectangle 10 290 'solid "Silver")
                 630 0
-                (rectangle 10 360 'solid "Silver"))
+                (rectangle 10 290 'solid "Silver"))
  (rectangle 640 10 'solid "Silver")))
 
 ;;; A scene with 3 buttons
@@ -184,6 +184,7 @@
               (list BUTTON1-POS BUTTON2-POS BUTTON3-POS)
               FRAME0))
 (define FRAME FRAME01)
+
 
 #;(crop 200 0 200 60 (ellipse 400 140 "solid" 'DarkGoldenrod))
 #;(define FRAME (overlay/offset (circle 90 'solid 'DarkGoldenrod)))
