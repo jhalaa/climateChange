@@ -43,7 +43,7 @@
 (define NEGATIVE-VELOCITY -5)
 
 (define CAR-Y 300)
-(define WATER-Y 330)
+(define WATER-Y 350)
 (define CLOUD-Y 100)
 (define TREE-Y 300)
 
@@ -129,7 +129,7 @@
 
 
 (define INITIAL-CLOUDS (list (make-cloud 100 5) (make-cloud 450 -5)))
-(define INITIAL-TREES (list (make-tree 30) (make-tree 40)))
+(define INITIAL-TREES (list (make-tree 20) (make-tree 50) (make-tree 100) (make-tree 200)))
 (define INITIAL-WATER (list (make-water 590 2) (make-water 620 -3)))
 (define INITIAL-FACTORIES (list))
 
@@ -369,12 +369,14 @@
                              (scene-trees (world-trs w)
                                           (scene-cars (world-crs w)
                                                       (scene-factories (world-fctrs w)
-                                                      SCENE)))))))
+                                                      SCENE)))) w)))
 ;; draws water
 
-(define (scene-water wtr-lst scene)
+(define (scene-water wtr-lst scene w)
   (foldl (lambda (wtr curr_scn)
-           (place-image WATER-BLUE (water-x wtr) WATER-Y curr_scn))
+           (place-image (if (checker w)
+                            WATER-PURPLE
+                            WATER-BLUE) (water-x wtr) WATER-Y curr_scn))
          scene
          wtr-lst))
 
@@ -485,3 +487,6 @@
 
 (define (add-factory fl)
   (append fl (list (make-factory (+ 100 (* (length fl) 60))))))
+
+(define (checker world)
+  (or (> (length (world-fctrs world)) 2) (< (length (world-trs world)) 1) (> (length (world-crs world)) 3)))
