@@ -15,7 +15,8 @@
          new-car
          CAR
          FACTORY
-         FRAME)
+         FRAME
+         CLOUD-G)
 
 ;;; SUN size : 87 * 100
 (define SUN (let ([petal (put-pinhole
