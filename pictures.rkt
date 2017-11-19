@@ -13,7 +13,8 @@
          WATER-CFBLUE
          WATER-PURPLE
          new-car
-         CAR)
+         CAR
+         FACTORY)
 
 
 ;;; MOUNTAINS
@@ -48,7 +49,16 @@
          (rectangle 640 360 'solid 'Silver)))
 ;;; BUTTON is just a black square outline
 ;;; BUTTON is 40 * 40
-(define BUTTON (rectangle 40 40 'outline 'black))
+(define BUTTON 
+                (overlay 
+                (rectangle 40 40 'outline 'black)
+                (add-line
+                 (add-line
+                (rectangle 40 40 'solid 'DarkGray)
+                0 0 0 37.5
+                (make-pen "LemonChiffon" 5 "solid" "round" "round"))
+                0 0 37.5 0
+                (make-pen "LemonChiffon" 5 "solid" "round" "round"))))
 
 ;;; store positions of buttons
 (define BUTTON1-POS (make-posn 40 30))
@@ -130,6 +140,48 @@
 (define WATER-PURPLE (water "Indigo"))
 
 ;;; FACTORY
-(overlay/offset (rectangle 120 50 'solid 'DimGray)
-                100 10
-                (rectangle 20 40 'solid 'black))
+(define FACTORY (overlay/align/offset
+ "right" "top"
+ (rectangle 20 40 'solid 'DimGray)
+ 25 40
+ (overlay/align/offset
+ "middle" "bottom"
+ (rectangle 20 30 'solid 'black)
+ 20 0
+ (rectangle 120 50 'solid 'DimGray))))
+
+
+(define BUTTON1 (overlay (rectangle 40 40 'outline 'black)
+                         (place-image/align
+                 (overlay (scale 0.53 CAR) BUTTON)
+                 40 40 "right" "bottom"
+                 (empty-scene 40 40))))
+(define BUTTON2 (overlay (rectangle 40 40 'outline 'black)
+                         (place-image/align
+                 (overlay (scale 0.43 TREE) BUTTON)
+                 40 40 "right" "bottom"
+                 (empty-scene 40 40))))
+(define BUTTON3 (overlay (rectangle 40 40 'outline 'black)
+                         (place-image/align
+                 (overlay (scale 0.27 FACTORY) BUTTON)
+                 40 40 "right" "bottom"
+                 (empty-scene 40 40))))
+
+
+
+;;; FRAME
+(define FRAME0
+  (above
+ (rectangle 640 60 'solid "Silver")
+ (overlay/offset (rectangle 10 360 'solid "Silver")
+                630 0
+                (rectangle 10 360 'solid "Silver"))
+ (rectangle 640 10 'solid "Silver")))
+
+;;; A scene with 3 buttons
+(define FRAME01 (place-images (list BUTTON1 BUTTON2 BUTTON3)
+              (list BUTTON1-POS BUTTON2-POS BUTTON3-POS)
+              FRAME0))
+
+#;(crop 200 0 200 60 (ellipse 400 140 "solid" 'DarkGoldenrod))
+#;(define FRAME (overlay/offset (circle 90 'solid 'DarkGoldenrod)))
