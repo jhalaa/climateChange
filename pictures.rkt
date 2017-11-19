@@ -5,7 +5,7 @@
 (require rackunit)
 (require "extras.rkt")
 (require 2htdp/image) ; draw a picture
-(provide SCENE3
+(provide SCENE
          TREE
          CLOUD
          SUN
@@ -14,7 +14,8 @@
          WATER-PURPLE
          new-car
          CAR
-         FACTORY)
+         FACTORY
+         FRAME)
 
 
 ;;; MOUNTAINS
@@ -182,6 +183,7 @@
 (define FRAME01 (place-images (list BUTTON1 BUTTON2 BUTTON3)
               (list BUTTON1-POS BUTTON2-POS BUTTON3-POS)
               FRAME0))
+(define FRAME FRAME01)
 
 #;(crop 200 0 200 60 (ellipse 400 140 "solid" 'DarkGoldenrod))
 #;(define FRAME (overlay/offset (circle 90 'solid 'DarkGoldenrod)))
