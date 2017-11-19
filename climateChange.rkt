@@ -131,6 +131,7 @@
 (define INITIAL-CLOUDS (list (make-cloud 100 5) (make-cloud 450 -5)))
 (define INITIAL-TREES (list (make-tree 30) (make-tree 40)))
 (define INITIAL-WATER (list (make-water 590 2) (make-water 620 -3)))
+(define INITIAL-FACTORIES (list))
 
 
 ;; Functions ;;
@@ -361,11 +362,14 @@
 
 ;; FUNCTION DEFINITION
 (define (world-to-scene w)
+  (place-image FRAME 320 180
+               
   (scene-water (world-wtr w)
                (scene-clouds (world-clds w)
                              (scene-trees (world-trs w)
                                           (scene-cars (world-crs w)
-                                                      SCENE3)))))
+                                                      (scene-factories (world-fctrs w)
+                                                      SCENE)))))))
 ;; draws water
 
 (define (scene-water wtr-lst scene)
@@ -398,6 +402,11 @@
          scene
          trees-lst))
 
+(define (scene-factories fact-lst scene)
+  (foldl (lambda (fct curr_scn)
+           (place-image FACTORY (factory-x fct) TREE-Y curr_scn))
+         scene
+         fact-lst))
 
 
 (define (world-after-mouse-event w x y mev)
@@ -475,4 +484,4 @@
 ;; DESIGN STRATEGY: Use simpler functions
 
 (define (add-factory fl)
-  (append fl (list (make-factory 250))))
+  (append fl (list (make-factory (+ 100 (* (length fl) 60))))))
